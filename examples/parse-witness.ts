@@ -1,0 +1,11 @@
+import * as btc from '@scure/btc-signer';
+import { hex } from '@scure/base';
+import * as ordinals from '../src/index.ts';
+
+// Parse inscriptions from a reveal tx hex
+(() => {
+  const txHex = '0200000000010158e87a21b56daf0c23be8e7070456c336f7cbaa5c8757924f545887bb2abdd750000000000ffffffff01dc05000000000000225120a6c9676014f93c456161b946a7251f680b5ce31b52cf16b687b78f40bc4013ad03400e0888a69181fb2745c81cb595bdc1966e8b974a1c06b944e5f2be655af01fe5e1cc9626d6a97041a4b18654e20f7bd88a6ab1d12f6518b03264a19493946a7e7020f76a39d05686e34a4420897e359371836145dd3973e3982568b60f8433adde6eac0063036f72640101106170706c69636174696f6e2f6a736f6e00327b22736f6d65223a312c2274657374223a322c22696e736372697074696f6e223a747275652c22696e223a226a736f6e227d6821c150929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac000000000';
+  const tx = btc.Transaction.fromRaw(hex.decode(txHex));
+  const inscriptions = ordinals.parseWitness(tx.inputs[0].finalScriptWitness);
+  console.log('inscriptions', inscriptions);
+})();
