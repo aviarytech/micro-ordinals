@@ -8,7 +8,7 @@ import { OutOrdinalReveal, p2tr_ord_reveal, parseWitness } from '../index.js';
 // Prints lines prefixed with KEY=VALUE for easy parsing.
 
 const MODE = process.env.MODE || 'simple';
-const PRIV_HEX = process.env.PRIV_HEX || '0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a';
+const PRIV_HEX = process.env.PRIV_HEX || '01'.repeat(32);
 const FEE = BigInt(process.env.FEE || '500');
 const FUNDING_TXID = process.env.FUNDING_TXID || '';
 const FUNDING_INDEX = Number.isFinite(Number(process.env.FUNDING_INDEX)) ? Number(process.env.FUNDING_INDEX) : undefined;

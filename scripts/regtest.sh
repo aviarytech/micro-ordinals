@@ -10,10 +10,17 @@ LOGS="$DIR/logs"
 DATADIR="$DIR/.regtest"
 mkdir -p "$LOGS" "$DATADIR"
 
+# Prefer locally downloaded Bitcoin Core if present
+if [ -d "/workspace/.bitcoin-core/bin" ]; then
+  export PATH="/workspace/.bitcoin-core/bin:$PATH"
+fi
+
 BITCOIND=${BITCOIND:-bitcoind}
 CLI=${CLI:-bitcoin-cli}
 RPCPORT=${RPCPORT:-18443}
 PORT=${PORT:-18444}
+WALLET_NAME=${WALLET_NAME:-w1}
+WALLET_ARG="-rpcwallet=$WALLET_NAME"
 
 start_node() {
   "$BITCOIND" -regtest \
@@ -35,12 +42,21 @@ start_node() {
   done
 }
 
+ensure_wallet() {
+  # Create wallet if not exists; ignore error if already exists
+  if ! "$CLI" -regtest -rpcuser=user -rpcpassword=pass -rpcport=$RPCPORT listwallets | jq -e '.[] | select(.=="'$WALLET_NAME'")' >/dev/null; then
+    "$CLI" -regtest -rpcuser=user -rpcpassword=pass -rpcport=$RPCPORT createwallet "$WALLET_NAME" >/dev/null
+  fi
+  # Load wallet (ignore error if already loaded)
+  "$CLI" -regtest -rpcuser=user -rpcpassword=pass -rpcport=$RPCPORT loadwallet "$WALLET_NAME" >/dev/null 2>&1 || true
+}
+
 stop_node() {
   "$CLI" -regtest -rpcuser=user -rpcpassword=pass -rpcport=$RPCPORT stop >/dev/null || true
 }
 
 new_address() {
-  "$CLI" -regtest -rpcuser=user -rpcpassword=pass -rpcport=$RPCPORT getnewaddress '' bech32m
+  "$CLI" -regtest -rpcuser=user -rpcpassword=pass -rpcport=$RPCPORT $WALLET_ARG getnewaddress '' bech32m
 }
 
 mine() {
@@ -53,13 +69,14 @@ mine() {
 send_to() {
   local addr=$1
   local amount=$2 # BTC
-  "$CLI" -regtest -rpcuser=user -rpcpassword=pass -rpcport=$RPCPORT -named sendtoaddress address="$addr" amount="$amount"
+  "$CLI" -regtest -rpcuser=user -rpcpassword=pass -rpcport=$RPCPORT $WALLET_ARG -named sendtoaddress address="$addr" amount="$amount"
 }
 
 # Clean previous run
 stop_node || true
 rm -rf "$DATADIR/regtest"
 start_node
+ensure_wallet
 
 # Prefund wallet
 mine 101
@@ -80,7 +97,7 @@ run_mode() {
   mine 1
   # Fetch vout and amount
   local vout amount
-  vout=$($CLI -regtest -rpcuser=user -rpcpassword=pass -rpcport=$RPCPORT gettransaction "$txid" | jq -r '.details[] | select(.address=="'$addr'") | .vout' | head -n1)
+  vout=$($CLI -regtest -rpcuser=user -rpcpassword=pass -rpcport=$RPCPORT $WALLET_ARG gettransaction "$txid" | jq -r '.details[] | select(.address=="'$addr'") | .vout' | head -n1)
   amount=$($CLI -regtest -rpcuser=user -rpcpassword=pass -rpcport=$RPCPORT gettxout "$txid" "$vout" | jq -r '.value' )
   # Convert BTC to sat
   local amount_sat
