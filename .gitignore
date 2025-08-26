@@ -6,5 +6,6 @@ node_modules
 *.d.ts.map
 /test/build
 /test/compiled
-/.regtest
-/.bitcoin-core
+/.regtest/
+/.bitcoin-core/
+/logs/
