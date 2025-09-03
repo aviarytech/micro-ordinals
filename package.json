@@ -1,0 +1,56 @@
+{
+  "name": "micro-ordinals",
+  "version": "0.3.0",
+  "description": "Manage ordinals, inscriptions and runes using scure-btc-signer",
+  "files": [
+    "*.js",
+    "*.js.map",
+    "*.d.ts",
+    "*.d.ts.map",
+    "src"
+  ],
+  "bin": {
+    "ord": "cli.js"
+  },
+  "dependencies": {
+    "@scure/base": "^2.0.0-beta.1",
+    "@scure/btc-signer": "^2.0.0-beta.1",
+    "enquirer": "2.4.1",
+    "micro-packed": "^0.8.0-beta.1"
+  },
+  "devDependencies": {
+    "@noble/curves": "^2.0.0-beta.1",
+    "@paulmillr/jsbt": "0.4.3",
+    "@types/node": "24.2.1",
+    "prettier": "3.5.3",
+    "typescript": "5.9.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:release": "npx jsbt esbuild test/build",
+    "format": "prettier --write src",
+    "test": "node test/index.ts",
+    "test:bun": "bun test/index.ts",
+    "test:deno": "deno --allow-env --allow-read test/index.ts"
+  },
+  "keywords": [
+    "ordinal",
+    "inscription",
+    "rune",
+    "bitcoin",
+    "ordinals",
+    "inscriptions",
+    "btc"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paulmillr/micro-ordinals.git"
+  },
+  "type": "module",
+  "main": "index.js",
+  "module": "index.js",
+  "types": "index.d.ts",
+  "sideEffects": false,
+  "author": "Paul Miller (https://paulmillr.com)",
+  "license": "MIT"
+}
